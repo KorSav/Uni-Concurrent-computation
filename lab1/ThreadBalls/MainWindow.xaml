@@ -19,7 +19,7 @@
             <SolidColorBrush Color="#d4d4d4"/>
         </Grid.Background>
 
-        <Canvas Grid.ColumnSpan="2">
+        <Canvas Grid.ColumnSpan="2" x:Name="canvas">
             <Canvas.Background>
                 <SolidColorBrush Color="#fafafa"/>
             </Canvas.Background>
@@ -30,6 +30,7 @@
             VerticalAlignment="Center"
             FontSize="30"
             Margin="40,20" Padding="10,0"
+            Click="ButtonStart_Click"
             > Start </Button>
 
         <Button Grid.Row="1" Grid.Column="1"
@@ -37,6 +38,7 @@
             VerticalAlignment="Center"
             FontSize="30"
             Margin="40,20" Padding="10,0"
+            Click="ButtonStop_Click"
             > Stop </Button>
     </Grid>
 </Window>
