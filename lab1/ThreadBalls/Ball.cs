@@ -7,7 +7,7 @@ namespace ThreadBalls;
 
 public class Ball: IDisposable
 {
-    public readonly double R = 10;
+    public readonly double R;
     private readonly Dispatcher _dispatcher;
     private readonly Canvas _canvas;
     private readonly Ellipse _circle;
@@ -17,19 +17,28 @@ public class Ball: IDisposable
     public double X { get; private set; }
     public double Y { get; private set; }
 
-    public Ball(Canvas canvas, Dispatcher dispatcher, Color color)
+    public Ball(Canvas canvas, Dispatcher dispatcher, Color color, double r)
+        : this(canvas, dispatcher, color, r, 0, 0)
     {
+        var rand = new Random();
+        if (rand.NextSingle() < 0.5) {
+            X = R + rand.NextDouble() * (_canvas.ActualWidth - 2 * R);
+            Y = R;
+        }
+        else {
+            X = R;
+            Y = R + rand.NextDouble() * (_canvas.ActualHeight - 2 * R);
+        }
+        UpdatePosition();
+    }
+
+    public Ball(Canvas canvas, Dispatcher dispatcher, Color color, double r, double x, double y)
+    {
+        R = r;
         _canvas = canvas;
         _dispatcher = dispatcher;
-        var rand = new Random();
-        // if (rand.NextSingle() < 0.5) {
-        //     X = R + rand.NextDouble() * (_canvas.ActualWidth - 2 * R);
-        //     Y = R;
-        // }
-        // else {
-        X = R;
-        Y = R + rand.NextDouble() * (_canvas.ActualHeight - 2 * R);
-        // }
+        X = x;
+        Y = y;
         _circle = new Ellipse() {
             Width = 2 * R,
             Height = 2 * R,
