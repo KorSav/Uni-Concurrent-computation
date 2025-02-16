@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ThreadBalls"
         mc:Ignorable="d"
-        Title="Bounce program" Height="630" Width="800">
+        Title="Bounce program" Height="630" Width="800"
+        Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -14,12 +15,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.Background>
             <SolidColorBrush Color="#d4d4d4"/>
         </Grid.Background>
 
-        <Canvas Grid.ColumnSpan="2" x:Name="canvas">
+        <Canvas Grid.ColumnSpan="3" x:Name="canvas" ClipToBounds="True">
             <Canvas.Background>
                 <SolidColorBrush Color="#fafafa"/>
             </Canvas.Background>
@@ -40,5 +42,14 @@
             Margin="40,20" Padding="10,0"
             Click="ButtonStop_Click"
             > Stop </Button>
+
+        <StackPanel Grid.Row="1" Grid.Column="2"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Margin="0,0,30,0"
+            Orientation="Horizontal">
+            <TextBlock FontSize="20" Text="Potted balls count: "/>
+            <TextBlock FontSize="20" x:Name="pottedCount" Text="0"/>
+        </StackPanel>
     </Grid>
 </Window>

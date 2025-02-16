@@ -5,16 +5,17 @@ using System.Windows.Threading;
 
 namespace ThreadBalls;
 
-public class Ball
+public class Ball: IDisposable
 {
+    public readonly double R = 10;
     private readonly Dispatcher _dispatcher;
-    private readonly Ellipse _circle;
     private readonly Canvas _canvas;
-    private readonly double r = 15;
-    private double x;
-    private double y;
+    private readonly Ellipse _circle;
     private double dx = 2;
     private double dy = 2;
+
+    public double X { get; private set; }
+    public double Y { get; private set; }
 
     public Ball(Canvas canvas, Dispatcher dispatcher)
     {
@@ -22,16 +23,16 @@ public class Ball
         _dispatcher = dispatcher;
         var rand = new Random();
         if (rand.NextSingle() < 0.5) {
-            x = r + rand.NextDouble() * (_canvas.ActualWidth - 2 * r);
-            y = r;
+            X = R + rand.NextDouble() * (_canvas.ActualWidth - 2 * R);
+            Y = R;
         }
         else {
-            x = r;
-            y = r + rand.NextDouble() * (_canvas.ActualHeight - 2 * r);
+            X = R;
+            Y = R + rand.NextDouble() * (_canvas.ActualHeight - 2 * R);
         }
         _circle = new Ellipse() {
-            Width = 2 * r,
-            Height = 2 * r,
+            Width = 2 * R,
+            Height = 2 * R,
             Fill = new SolidColorBrush(Colors.Black),
         };
         _canvas.Children.Add(_circle);
@@ -41,31 +42,37 @@ public class Ball
     private void UpdatePosition()
     {
         _dispatcher.Invoke(() => {
-            Canvas.SetLeft(_circle, x - r);
-            Canvas.SetTop(_circle, y - r);
+            Canvas.SetLeft(_circle, X - R);
+            Canvas.SetTop(_circle, Y - R);
         });
     }
 
     public void Move()
     {
-        x += dx;
-        y += dy;
-        if (x - r < 0) {
-            x = r;
+        X += dx;
+        Y += dy;
+        if (X - R < 0) {
+            X = R;
             dx = -dx;
         }
-        if (x + r >= _canvas.ActualWidth) {
-            x = _canvas.ActualWidth - r;
+        if (X + R >= _canvas.ActualWidth) {
+            X = _canvas.ActualWidth - R;
             dx = -dx;
         }
-        if (y - r < 0) {
-            y = r;
+        if (Y - R < 0) {
+            Y = R;
             dy = -dy;
         }
-        if (y + r >= _canvas.ActualHeight) {
-            y = _canvas.ActualHeight - r;
+        if (Y + R >= _canvas.ActualHeight) {
+            Y = _canvas.ActualHeight - R;
             dy = -dy;
         }
         UpdatePosition();
+    }
+
+    public void Dispose()
+    {
+        _dispatcher.Invoke(() => _canvas.Children.Remove(_circle));
+        GC.SuppressFinalize(this);
     }
 }
