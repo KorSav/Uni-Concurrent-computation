@@ -12,28 +12,28 @@ public class Ball: IDisposable
     private readonly Canvas _canvas;
     private readonly Ellipse _circle;
     private double dx = 2;
-    private double dy = 2;
+    private double dy = 0;
 
     public double X { get; private set; }
     public double Y { get; private set; }
 
-    public Ball(Canvas canvas, Dispatcher dispatcher)
+    public Ball(Canvas canvas, Dispatcher dispatcher, Color color)
     {
         _canvas = canvas;
         _dispatcher = dispatcher;
         var rand = new Random();
-        if (rand.NextSingle() < 0.5) {
-            X = R + rand.NextDouble() * (_canvas.ActualWidth - 2 * R);
-            Y = R;
-        }
-        else {
-            X = R;
-            Y = R + rand.NextDouble() * (_canvas.ActualHeight - 2 * R);
-        }
+        // if (rand.NextSingle() < 0.5) {
+        //     X = R + rand.NextDouble() * (_canvas.ActualWidth - 2 * R);
+        //     Y = R;
+        // }
+        // else {
+        X = R;
+        Y = R + rand.NextDouble() * (_canvas.ActualHeight - 2 * R);
+        // }
         _circle = new Ellipse() {
             Width = 2 * R,
             Height = 2 * R,
-            Fill = new SolidColorBrush(Colors.Black),
+            Fill = new SolidColorBrush(color),
         };
         _canvas.Children.Add(_circle);
         UpdatePosition();
