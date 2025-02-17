@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lab1", "lab1", "{D57A4D3A-3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreadBalls", "lab1\ThreadBalls\ThreadBalls.csproj", "{5264301A-C442-484F-B731-99067987E604}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Counter", "lab1\Counter\Counter.csproj", "{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,8 +34,21 @@ Global
 		{5264301A-C442-484F-B731-99067987E604}.Release|x64.Build.0 = Release|Any CPU
 		{5264301A-C442-484F-B731-99067987E604}.Release|x86.ActiveCfg = Release|Any CPU
 		{5264301A-C442-484F-B731-99067987E604}.Release|x86.Build.0 = Release|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Debug|x64.Build.0 = Debug|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Debug|x86.Build.0 = Debug|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Release|x64.ActiveCfg = Release|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Release|x64.Build.0 = Release|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Release|x86.ActiveCfg = Release|Any CPU
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5264301A-C442-484F-B731-99067987E604} = {D57A4D3A-3046-45D8-A492-C5229BE16DC5}
+		{097958BB-39DC-4D1C-BD8B-F8BFAFA01AC7} = {D57A4D3A-3046-45D8-A492-C5229BE16DC5}
 	EndGlobalSection
 EndGlobal
