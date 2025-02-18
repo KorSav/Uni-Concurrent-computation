@@ -22,15 +22,17 @@ class Counter
 {
     public int Value { get; private set; } = 0;
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Increment()
     {
-        Value++;
+        lock (this) {
+            Value++;
+        }
     }
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Decrement()
     {
-        Value--;
+        lock (this) {
+            Value--;
+        }
     }
 }
