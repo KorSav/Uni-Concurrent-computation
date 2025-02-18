@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-var counter = new Counter();
+﻿var counter = new Counter();
 var thread1 = new Thread(() => {
     for (int i = 0; i < 100_000; i++)
         counter.Increment();
@@ -20,18 +18,19 @@ System.Console.WriteLine($"Counter value: {counter.Value}");
 
 class Counter
 {
+    private readonly Lock _valueLock = new();
     public int Value { get; private set; } = 0;
 
     public void Increment()
     {
-        lock (this) {
+        lock (_valueLock) {
             Value++;
         }
     }
 
     public void Decrement()
     {
-        lock (this) {
+        lock (_valueLock) {
             Value--;
         }
     }
