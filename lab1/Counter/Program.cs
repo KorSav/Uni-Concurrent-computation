@@ -1,4 +1,6 @@
-﻿var counter = new Counter();
+﻿using System.Runtime.CompilerServices;
+
+var counter = new Counter();
 var thread1 = new Thread(() => {
     for (int i = 0; i < 100_000; i++)
         counter.Increment();
@@ -20,11 +22,13 @@ class Counter
 {
     public int Value { get; private set; } = 0;
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Increment()
     {
         Value++;
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Decrement()
     {
         Value--;
