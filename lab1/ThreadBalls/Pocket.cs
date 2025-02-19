@@ -14,6 +14,7 @@ public class Pocket
     private double _x;
     private double _y;
 
+    private readonly Lock _pottedCountLock = new();
     public int PottedCount { get; private set; }
 
     public Pocket(Canvas canvas, double r, double relativeX, double relativeY)
@@ -47,7 +48,7 @@ public class Pocket
             Math.Pow(_y - ball.Y, 2)
         );
         if (d < _r + ball.R) {
-            PottedCount++;
+            lock(_pottedCountLock) PottedCount++;
             ball.Dispose();
             return true;
         }
