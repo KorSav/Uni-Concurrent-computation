@@ -1,14 +1,21 @@
-﻿Drop drop = new();
+﻿using static Constants;
+
+Drop drop = new();
 new Thread(new Producer(drop).Run).Start();
 new Thread(new Consumer(drop).Run).Start();
 
+public static class Constants
+{
+    public const int NumbersCount = 1000;
+}
+
 public class Drop
 {
-    private string _message = string.Empty;
+    private int _message;
     private readonly object _messageIsPut = new();
     private bool _empty = true;
 
-    public string Take()
+    public int Take()
     {
         lock (_messageIsPut) {
             while (_empty) {
@@ -23,7 +30,7 @@ public class Drop
         }
     }
 
-    public void Put(string message)
+    public void Put(int message)
     {
         lock (_messageIsPut) {
             while (!_empty) {
@@ -45,21 +52,15 @@ public class Producer(Drop drop)
 
     public void Run()
     {
-        string[] importantInfo = [
-            "Mares eat oats",
-            "Does eat oats",
-            "Little lambs eat ivy",
-            "A kid will eat ivy too"
-        ];
         Random random = new();
-        for (int i = 0; i < importantInfo.Length; i++) {
-            _drop.Put(importantInfo[i]);
+        for (int i = 0; i < NumbersCount; i++) {
+            _drop.Put(i);
             try {
-                Thread.Sleep(random.Next(5000));
+                Thread.Sleep(random.Next(15));
             }
             catch (ThreadInterruptedException) { }
         }
-        _drop.Put("DONE");
+        _drop.Put(-1);
     }
 }
 
@@ -70,12 +71,12 @@ public class Consumer(Drop drop)
     public void Run()
     {
         Random random = new();
-        for (string message = _drop.Take();
-            !message.Equals("DONE");
+        for (int message = _drop.Take();
+            message != -1;
             message = _drop.Take()) {
             System.Console.WriteLine($"MESSAGE RECEIVED: {message}");
             try {
-                Thread.Sleep(random.Next(5000));
+                Thread.Sleep(random.Next(15));
             }
             catch (ThreadInterruptedException) { }
         }
