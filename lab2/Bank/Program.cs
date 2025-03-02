@@ -1,10 +1,12 @@
-﻿const int NACCOUNTS = 10;
+﻿using System.Runtime.CompilerServices;
+
+const int NACCOUNTS = 10;
 const int INITIAL_BALANCE = 10_000;
 
 var b = new Bank(NACCOUNTS, INITIAL_BALANCE);
 for (int i = 0; i < NACCOUNTS; i++) {
     var transferer = new Transferer(b, i, INITIAL_BALANCE);
-    var thread = new Thread(() => transferer.Transfer(b.TransferWithLock)) {
+    var thread = new Thread(() => transferer.Transfer(b.TransferWithSyncMethod)) {
         Priority = ThreadPriority.Normal + i % 2
     };
     thread.Start();
@@ -14,11 +16,10 @@ class Bank
 {
     public static readonly int NTEST = 10_000;
     private readonly int[] _accounts;
+    private readonly Lock _lockTransact = new();
     private long _ntransacts;
 
     public delegate void Transfer(int from, int to, int amount);
-
-    private readonly Lock _lockTransact = new();
 
     public Bank(int n, int initialBalance)
     {
@@ -48,6 +49,27 @@ class Bank
             for (int i = 0; i < _accounts.Length; i++) {
                 sum += _accounts[i];
             }
+        }
+        System.Console.WriteLine($"Transactions: {_ntransacts} Sum: {sum}");
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public void TransferWithSyncMethod(int from, int to, int amount)
+    {
+        _accounts[from] -= amount;
+        _accounts[to] += amount;
+        _ntransacts++;
+        if (_ntransacts % NTEST == 0) {
+            TestWithSyncMethod();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public void TestWithSyncMethod()
+    {
+        int sum = 0;
+        for (int i = 0; i < _accounts.Length; i++) {
+            sum += _accounts[i];
         }
         System.Console.WriteLine($"Transactions: {_ntransacts} Sum: {sum}");
     }
