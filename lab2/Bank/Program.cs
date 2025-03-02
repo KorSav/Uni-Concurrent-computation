@@ -6,7 +6,7 @@ const int INITIAL_BALANCE = 10_000;
 var b = new Bank(NACCOUNTS, INITIAL_BALANCE);
 for (int i = 0; i < NACCOUNTS; i++) {
     var transferer = new Transferer(b, i, INITIAL_BALANCE);
-    var thread = new Thread(() => transferer.Transfer(b.TransferWithSyncMethod)) {
+    var thread = new Thread(() => transferer.Transfer(b.TransferWithMonitor)) {
         Priority = ThreadPriority.Normal + i % 2
     };
     thread.Start();
@@ -28,6 +28,25 @@ class Bank
             _accounts[i] = initialBalance;
         }
         _ntransacts = 0;
+    }
+
+    public void TransferAsync(int from, int to, int amount)
+    {
+        _accounts[from] -= amount;
+        _accounts[to] += amount;
+        _ntransacts++;
+        if (_ntransacts % NTEST == 0) {
+            TestAsync();
+        }
+    }
+
+    public void TestAsync()
+    {
+        int sum = 0;
+        for (int i = 0; i < _accounts.Length; i++) {
+            sum += _accounts[i];
+        }
+        System.Console.WriteLine($"Transactions: {_ntransacts} Sum: {sum}");
     }
 
     public void TransferWithLock(int from, int to, int amount)
@@ -70,6 +89,29 @@ class Bank
         int sum = 0;
         for (int i = 0; i < _accounts.Length; i++) {
             sum += _accounts[i];
+        }
+        System.Console.WriteLine($"Transactions: {_ntransacts} Sum: {sum}");
+    }
+
+    public void TransferWithMonitor(int from, int to, int amount)
+    {
+        lock (_accounts) {
+            _accounts[from] -= amount;
+            _accounts[to] += amount;
+            _ntransacts++;
+        }
+        if (_ntransacts % NTEST == 0) {
+            TestWithMonitor();
+        }
+    }
+
+    public void TestWithMonitor()
+    {
+        int sum = 0;
+        lock (_accounts) {
+            for (int i = 0; i < _accounts.Length; i++) {
+                sum += _accounts[i];
+            }
         }
         System.Console.WriteLine($"Transactions: {_ntransacts} Sum: {sum}");
     }
