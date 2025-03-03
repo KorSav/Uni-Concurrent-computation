@@ -9,17 +9,22 @@ class Teacher(Register register, int cell)
     public void ScoreStudent(StudentPosition sp)
     {
         int total = _register.GetTotal(sp);
-        if (total >= 100) return;
+        if (total >= 100)
+            return;
         int maxAllowedPoint = 100 - total;
         int point = _random.Next(maxAllowedPoint);
-        _register[sp, _cell] = point;
+        _register[sp][_cell] = point;
     }
 
-    public void ScoreAllStudents()
+    public void ScoreStudentSync(StudentPosition sp)
     {
-        StudentPosition sp = new(_register);
-        do
-            ScoreStudent(sp);
-        while (sp.Next());
+        lock (_register[sp]) {
+            int total = _register.GetTotal(sp);
+            if (total >= 100)
+                return;
+            int maxAllowedPoint = 100 - total;
+            int point = _random.Next(maxAllowedPoint);
+            _register[sp][_cell] = point;
+        }
     }
 }

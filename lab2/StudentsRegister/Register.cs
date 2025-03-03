@@ -11,16 +11,16 @@ class Register
         _points = new int[groupCount, studCount][];
         StudentPosition sp = new(groupCount, studCount);
         do
-            _points[sp.IGroup, sp.IStudent] = new int[cellCount];
+            this[sp] = new int[cellCount];
         while (sp.Next());
 
         GroupCount = groupCount;
         StudCount = studCount;
     }
 
-    public int this[StudentPosition sp, int cell] {
-        get => _points[sp.IGroup, sp.IStudent][cell];
-        set => _points[sp.IGroup, sp.IStudent][cell] = value;
+    public int[] this[StudentPosition sp] {
+        get => _points[sp.IGroup, sp.IStudent];
+        init => _points[sp.IGroup, sp.IStudent] = value;
     }
 
     public int GetTotal(StudentPosition sp)
