@@ -22,10 +22,8 @@ public static class SequentialMul
     private static double MultiplyRowByColumn(double[,] A, double[,] B, int irA, int icB)
     {
         double res = 0;
-        for (int icA = 0; icA < A.GetLength(1); icA++)
-            for (int irB = 0; irB < B.GetLength(0); irB++) {
-                res += A[irA, icA] * B[irB, icB];
-            }
+        for (int i = 0; i < A.GetLength(1); i++)
+                res += A[irA, i] * B[i, icB];
         return res;
     }
 }
