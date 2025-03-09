@@ -22,7 +22,7 @@ public static class StripeMul
                 threads.Length, i) {
                 Multiplicators = multiplicators
             };
-            threads[i] = new Thread(multiplicators[i].Multiply);
+            threads[i] = new Thread(multiplicators[i].Multiply){Name=$"Th-{i+1}"};
         }
         foreach (var th in threads)
             th.Start();
@@ -85,6 +85,10 @@ public static class StripeMul
             }
         }
 
+        private int TranslateArToCr(int irA){
+            return iThis * iterGroupSize + irA;
+        }
+
         private bool IsAllReadyToSwap()
         {
             foreach (var m in Multiplicators!) {
@@ -100,7 +104,8 @@ public static class StripeMul
             for (int icA = iA; icA < limIC; icA++)
                 for (int irA = 0; irA < ASubRows.GetLength(0); irA++)
                     for (int icB = 0; icB < BSubRows.GetLength(1); icB++) {
-                        C[irA, icB] += ASubRows[irA, icA] * BSubRows[icA-iA, icB];
+                        var cr = TranslateArToCr(irA);
+                        C[cr, icB] += ASubRows[irA, icA] * BSubRows[icA-iA, icB];
                     }
         }
     }
