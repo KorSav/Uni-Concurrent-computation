@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace MatrixMul;
 
 public static class SequentialMul
 {
-    public static double[,] Multiply(double[,] matrixA, double[,] matrixB)
+    public static Result Multiply(double[,] matrixA, double[,] matrixB)
     {
+        long startTime = Stopwatch.GetTimestamp();
         ValidateMultiplication(matrixA, matrixB);
         double[,] res = new double[matrixA.GetLength(0), matrixB.GetLength(1)];
         for (int irA = 0; irA < matrixA.GetLength(0); irA++) {
@@ -11,7 +14,8 @@ public static class SequentialMul
                 res[irA, icB] = MultiplyRowByColumn(matrixA, matrixB, irA, icB);
             }
         }
-        return res;
+        var elapsedTime = Stopwatch.GetElapsedTime(startTime);
+        return new Result(res, elapsedTime);
     }
 
     public static void MultiplyAndIncrement(double[,] matrixA, double[,] matrixB, double[,] matrixResult)

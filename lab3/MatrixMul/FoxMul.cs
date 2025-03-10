@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace MatrixMul;
 
 public static class FoxMul
@@ -7,8 +9,9 @@ public static class FoxMul
     /// Actual amount of threads used (atu):
     /// atu = n^2 for natural n, while atu ≤ threadsCount
     /// </summary>
-    public static double[,] Multiply(double[,] A, double[,] B, int threadsCount)
+    public static Result Multiply(double[,] A, double[,] B, int threadsCount)
     {
+        long startTime = Stopwatch.GetTimestamp();
         if (A.GetLength(1) != B.GetLength(0)) {
             throw new InvalidOperationException(
                 $"[{A.GetLength(0)}, {A.GetLength(1)}] X " +
@@ -30,7 +33,8 @@ public static class FoxMul
             th.Join();
 
         JoinMultiplicatorsResultsInto(multiplicators, C);
-        return C;
+        var elapsedTime = Stopwatch.GetElapsedTime(startTime);
+        return new Result(C, elapsedTime);
     }
 
     private static void JoinMultiplicatorsResultsInto(Multiplicator[] multiplicators, double[,] M)

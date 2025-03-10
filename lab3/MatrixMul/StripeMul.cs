@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace MatrixMul;
 
 public static class StripeMul
 {
-    public static double[,] Multiply(double[,] A, double[,] B, int threadsCount)
+    public static Result Multiply(double[,] A, double[,] B, int threadsCount)
     {
+        long startTime = Stopwatch.GetTimestamp();
         if (A.GetLength(1) != B.GetLength(0)) {
             throw new InvalidOperationException(
                 $"[{A.GetLength(0)}, {A.GetLength(1)}] X " +
@@ -31,7 +34,9 @@ public static class StripeMul
             th.Start();
         foreach (var th in threads)
             th.Join();
-        return C;
+        
+        var elapsedTime = Stopwatch.GetElapsedTime(startTime);
+        return new Result(C, elapsedTime);
     }
 
     private static double[,] GetSubRows(double[,] Arr, int rowGroupSize, int iGroup)

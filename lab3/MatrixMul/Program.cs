@@ -14,14 +14,14 @@ for (int ir = 0; ir < matrixSize; ir++)
     }
 
 System.Console.WriteLine("Stripe mul...");
-var C_stripe = StripeMul.Multiply(matrixA, matrixB, 9);
+var StripeRes = StripeMul.Multiply(matrixA, matrixB, 9);
 System.Console.WriteLine("Fox mul...");
-var C_fox = FoxMul.Multiply(matrixA, matrixB, 9);
+var FoxRes = FoxMul.Multiply(matrixA, matrixB, 9);
 System.Console.WriteLine("Sequential mul...");
-var C_seq = SequentialMul.Multiply(matrixA, matrixB);
+var SeqRes = SequentialMul.Multiply(matrixA, matrixB);
 System.Console.WriteLine("Calculate diffs...");
-var diff_stripe = MatrixComparator.CalcMaxAbsDiff(C_seq, C_stripe);
-var diff_fox = MatrixComparator.CalcMaxAbsDiff(C_seq, C_fox);
+var diff_stripe = MatrixComparator.CalcMaxAbsDiff(SeqRes.M, StripeRes.M);
+var diff_fox = MatrixComparator.CalcMaxAbsDiff(SeqRes.M, FoxRes.M);
 System.Console.WriteLine("Saving to file...");
 
 using (var wb = new XLWorkbook()) {
