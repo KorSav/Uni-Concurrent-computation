@@ -12,7 +12,8 @@ public class WordsLengthCounter {
         Histogram histogram = new Histogram();
         for (String line : document.getLines()) {
             for (String word : wordsIn(line)) {
-                histogram.Increment(word.length());
+                if (!word.isBlank())
+                    histogram.Increment(word.length());
             }
         }
         return histogram;

@@ -1,10 +1,11 @@
 package app;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Histogram {
-    private final List<Integer> wordLengthCounts = Collections.emptyList();
+    private final List<Integer> wordLengthCounts = new ArrayList<>();
 
     public Integer getCount() {
         return wordLengthCounts.size();
@@ -18,12 +19,18 @@ public class Histogram {
     }
 
     public void Add(Histogram histogram) {
-        UpdateSize(histogram.wordLengthCounts.size() + 1);
+        UpdateSize(histogram.wordLengthCounts.size());
         for (int i = 0; i < wordLengthCounts.size(); i++) {
             int c1 = wordLengthCounts.get(i);
-            int c2 = histogram.wordLengthCounts.get(i);
+            int c2 = 0;
+            if (i < histogram.wordLengthCounts.size())
+                c2 = histogram.wordLengthCounts.get(i);
             wordLengthCounts.set(i, c1 + c2);
         }
+    }
+
+    public Integer Get(int wordLength) {
+        return wordLengthCounts.get(wordLength - 1);
     }
 
     private void UpdateSize(int wordLength) {
