@@ -3,7 +3,6 @@ package app;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.DoubleBinaryOperator;
 
 public class Histogram {
     private final List<Integer> wordLengthCounts = new ArrayList<>();
