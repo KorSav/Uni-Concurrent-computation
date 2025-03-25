@@ -3,6 +3,7 @@ package app;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.DoubleBinaryOperator;
 
 public class Histogram {
     private final List<Integer> wordLengthCounts = new ArrayList<>();
@@ -27,6 +28,27 @@ public class Histogram {
                 c2 = histogram.wordLengthCounts.get(i);
             wordLengthCounts.set(i, c1 + c2);
         }
+    }
+
+    public Double CalculateMean() {
+        double total = 0;
+        int amount = 0;
+        for (int i = 0; i < wordLengthCounts.size(); i++) {
+            amount += wordLengthCounts.get(i);
+            total += wordLengthCounts.get(i) * (i + 1);
+        }
+        return total / amount;
+    }
+
+    public Double CalculateVariance() {
+        double sum = 0;
+        int amount = 0;
+        double mean = CalculateMean();
+        for (int i = 0; i < wordLengthCounts.size(); i++) {
+            amount += wordLengthCounts.get(i);
+            sum += Math.pow(i + 1 - mean, 2) * wordLengthCounts.get(i);
+        }
+        return sum / amount;
     }
 
     public Integer Get(int wordLength) {
