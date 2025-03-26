@@ -8,10 +8,12 @@ import java.util.List;
 public class Folder {
     private final List<Folder> subFolders;
     private final List<Document> documents;
+    private final String name;
 
-    Folder(List<Folder> subFolders, List<Document> documents) {
+    Folder(List<Folder> subFolders, List<Document> documents, String name) {
         this.subFolders = subFolders;
         this.documents = documents;
+        this.name = name;
     }
 
     public List<Folder> getSubFolders() {
@@ -20,6 +22,10 @@ public class Folder {
 
     public List<Document> getDocuments() {
         return this.documents;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static Folder fromDirectory(File dir) throws IOException {
@@ -32,6 +38,6 @@ public class Folder {
                 documents.add(Document.fromFile(entry));
             }
         }
-        return new Folder(subFolders, documents);
+        return new Folder(subFolders, documents, dir.getName());
     }
 }

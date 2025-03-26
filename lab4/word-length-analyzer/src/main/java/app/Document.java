@@ -9,9 +9,15 @@ import java.util.List;
 
 public class Document {
     private final List<String> lines;
+    private final String name;
 
-    Document(List<String> lines) {
+    Document(List<String> lines, String name) {
         this.lines = lines;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<String> getLines() {
@@ -27,6 +33,6 @@ public class Document {
                 line = reader.readLine();
             }
         }
-        return new Document(lines);
+        return new Document(lines, file.getName());
     }
 }
