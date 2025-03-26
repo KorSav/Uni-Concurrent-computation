@@ -12,10 +12,14 @@ public class Main {
         MatrixPair mp = MatrixUtils.generateRandomMatrices(500);
         Result resStripe = StripeMul.multiply(mp.getMatrixA(), mp.getMatrixB(), 12);
         Result resSeq = SequentialMul.multiply(mp.getMatrixA(), mp.getMatrixB());
+        Result resForkJoin = app.ForkJoinImpl.StripeMul.multiply(mp.getMatrixA(), mp.getMatrixB());
         double diff = MatrixComparator.calcMaxAbsDiff(
                 resStripe.getResultMatrix(),
                 resSeq.getResultMatrix());
-        System.out.println("Stripe result diff from sequential: %e".formatted(diff));
-        System.out.println("Hello world!");
+        System.out.println("Stripe threads diff: %e".formatted(diff));
+        diff = MatrixComparator.calcMaxAbsDiff(
+                resForkJoin.getResultMatrix(),
+                resSeq.getResultMatrix());
+        System.out.println("Stripe fork/join diff: %e".formatted(diff));
     }
 }
