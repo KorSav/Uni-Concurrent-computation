@@ -1,4 +1,4 @@
-package app;
+package app.analyzer;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,10 +1,13 @@
-package app;
+package app.analyzer;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 
-class FolderWordsCountTask extends RecursiveTask<Histogram> {
+import app.Document;
+import app.Folder;
+
+public class FolderWordsCountTask extends RecursiveTask<Histogram> {
     private final Folder folder;
 
     public FolderWordsCountTask(Folder folder) {

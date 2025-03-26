@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-class Document {
+public class Document {
     private final List<String> lines;
 
     Document(List<String> lines) {
         this.lines = lines;
     }
 
-    List<String> getLines() {
+    public List<String> getLines() {
         return this.lines;
     }
 

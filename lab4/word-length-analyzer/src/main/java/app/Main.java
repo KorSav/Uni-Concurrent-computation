@@ -3,6 +3,9 @@ package app;
 import java.io.File;
 import java.io.IOException;
 
+import app.analyzer.ExperimentResult;
+import app.analyzer.WordsLengthCounter;
+
 public class Main {
     public static void main(String[] args) throws IOException {
         Folder folder = Folder.fromDirectory(new File(args[0]));

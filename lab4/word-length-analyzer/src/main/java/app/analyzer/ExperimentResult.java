@@ -1,4 +1,4 @@
-package app;
+package app.analyzer;
 
 public class ExperimentResult {
     public long timeSeq;

@@ -1,6 +1,8 @@
-package app;
+package app.analyzer;
 
 import java.util.concurrent.RecursiveTask;
+
+import app.Document;
 
 class DocumentWordsCountTask extends RecursiveTask<Histogram> {
     private final Document document;

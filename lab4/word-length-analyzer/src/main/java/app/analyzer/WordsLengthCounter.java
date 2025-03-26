@@ -1,6 +1,9 @@
-package app;
+package app.analyzer;
 
 import java.util.concurrent.ForkJoinPool;
+
+import app.Document;
+import app.Folder;
 
 public class WordsLengthCounter {
 
