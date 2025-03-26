@@ -24,7 +24,14 @@ public class Document {
         return this.lines;
     }
 
-    static Document fromFile(File file) throws IOException {
+    public void trimLines() {
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            lines.set(i, line.trim());
+        }
+    }
+
+    public static Document fromFile(File file) throws IOException {
         List<String> lines = new LinkedList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
