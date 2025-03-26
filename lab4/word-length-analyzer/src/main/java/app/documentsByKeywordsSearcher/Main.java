@@ -23,7 +23,8 @@ public class Main {
         List<KeywordsMatchResult> mrs = ForkJoinPool.commonPool()
                 .invoke(new FolderDocsMatchKeywordsTask(folder, keywords));
         long tSpent = System.currentTimeMillis() - t0;
-        System.out.println("Documents matching keywords:");
+        System.out.println("Documents matching keywords (%d/%d):"
+                .formatted(mrs.size(), folder.getAllDocsCount()));
         mrs.sort((mr1, mr2) -> mr2.getMatchedCount() - mr1.getMatchedCount());
         for (KeywordsMatchResult mr : mrs) {
             System.out.print("%s (%d/%d): ".formatted(

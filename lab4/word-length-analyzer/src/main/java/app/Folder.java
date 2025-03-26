@@ -28,6 +28,14 @@ public class Folder {
         return name;
     }
 
+    public int getAllDocsCount() {
+        int docsCount = documents.size();
+        for (Folder folder : subFolders) {
+            docsCount += folder.getAllDocsCount();
+        }
+        return docsCount;
+    }
+
     public static Folder fromDirectory(File dir) throws IOException {
         List<Document> documents = new LinkedList<>();
         List<Folder> subFolders = new LinkedList<>();
