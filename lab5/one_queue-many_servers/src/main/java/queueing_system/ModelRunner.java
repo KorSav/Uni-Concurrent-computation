@@ -13,14 +13,21 @@ public class ModelRunner implements Callable<ModelResult> {
     QueueLengthCounter counter;
     Future<Integer> futCancelCount;
     Future<Double> futAverageQueueSize;
-    int clientsCount = 1000;
+    Thread logThread;
+    int clientsCount;
+    int modelNumber;
+    int logIntervalMillis;
 
     public ModelRunner(
             int queueSize, int serversCount,
             double measureIntervalMillis,
             int clientProcessingTimeMillis,
             int meanClientCreationTimeMillis,
-            int biasClientCreationTimeMillis) {
+            int biasClientCreationTimeMillis,
+            int clientsCount, int modelNumber, int logIntervalMillis) {
+        this.clientsCount = clientsCount;
+        this.modelNumber = modelNumber;
+        this.logIntervalMillis = logIntervalMillis;
         queue = new SemiBlockingQueue<>(queueSize);
         consumers = new Consumer[serversCount];
         for (int i = 0; i < serversCount; i++) {
@@ -32,6 +39,10 @@ public class ModelRunner implements Callable<ModelResult> {
                 biasClientCreationTimeMillis,
                 clientProcessingTimeMillis);
         counter = new QueueLengthCounter(queue, measureIntervalMillis);
+        logThread = new Thread(
+                new ModelLogger(
+                        producer, counter,
+                        queue, this.logIntervalMillis, modelNumber));
     }
 
     @Override
@@ -43,11 +54,10 @@ public class ModelRunner implements Callable<ModelResult> {
         }
         futCancelCount = executorService.submit(producer);
         futAverageQueueSize = executorService.submit(counter);
-        double cancelProb = futCancelCount.get() / (double) clientsCount * 100;
+        logThread.start();
+        double cancelProb = futCancelCount.get() / (double) clientsCount;
         double avgQueueSize = futAverageQueueSize.get();
-        System.out.println("Cancel prob: %.1f%%; Avg queue size: %f"
-                .formatted(cancelProb, avgQueueSize));
         executorService.shutdown();
-        return new ModelResult(cancelProb, avgQueueSize);
+        return new ModelResult(cancelProb, avgQueueSize, modelNumber);
     }
 }

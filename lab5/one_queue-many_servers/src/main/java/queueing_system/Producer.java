@@ -44,4 +44,8 @@ public class Producer implements Callable<Integer> {
         int noise = random.nextInt(_bias * 2) - _bias;
         return noise + _mean;
     }
+
+    public int getCancelCount() {
+        return _cancel_count;
+    }
 }

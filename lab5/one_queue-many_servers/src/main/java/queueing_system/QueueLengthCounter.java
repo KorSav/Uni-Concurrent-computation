@@ -50,4 +50,8 @@ public class QueueLengthCounter implements Callable<Double> {
         _queueSizes.add(_queue.size());
         _timeSpansMillis.add((System.nanoTime() - nanos) / 1e6);
     }
+
+    public int getQueueSize() {
+        return _queue.size();
+    }
 }

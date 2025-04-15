@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -14,6 +15,7 @@ public class Main {
     static int queueSize = 5;
     static int serversCount = 3;
     static double measureIntervalMillis = 10;
+    static int logIntervalMillis = 200;
     static int clientProcessingTimeMillis = 15;
     static int meanClientCreationTimeMillis = 4;
     static int biasClientCreationTimeMillis = 1;
@@ -26,20 +28,28 @@ public class Main {
             modelRunners.add(new ModelRunner(
                     queueSize, serversCount,
                     measureIntervalMillis, clientProcessingTimeMillis,
-                    meanClientCreationTimeMillis, biasClientCreationTimeMillis));
+                    meanClientCreationTimeMillis, biasClientCreationTimeMillis,
+                    clientsCount, i + 1, logIntervalMillis));
         }
         List<Future<ModelResult>> results = executorService.invokeAll(modelRunners);
-        ModelResult result = new ModelResult(0, 0);
+        ModelResult result = new ModelResult(0, 0, 0);
         for (var future : results) {
             result.avgQueueSize += future.get().avgQueueSize;
             result.cancelProbability += future.get().cancelProbability;
         }
+        executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
+        System.out.println("\nModels results:");
+        for (var future : results) {
+            ModelResult mr = future.get();
+            System.out.println("%-2d Cancel prob: %.3f; Avg queue size: %f"
+                    .formatted(mr.modelNumber, mr.cancelProbability, mr.avgQueueSize));
+        }
         result.avgQueueSize /= passesCount;
         result.cancelProbability /= passesCount;
-        executorService.shutdown();
         System.out.println("\nResult of modelling with %d passes"
                 .formatted(passesCount));
-        System.out.println("Cancel prob: %.1f%%; Avg queue size: %f"
+        System.out.println("Cancel prob: %.3f; Avg queue size: %f"
                 .formatted(result.cancelProbability, result.avgQueueSize));
     }
 }
