@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+// #include <string.h>
 #include <mpi.h>
 
 #define MASTER 0
@@ -13,24 +13,50 @@
 
 typedef struct _params_nb
 {
-    const double *const a;
-    const double *const b;
+    const double *const a, *const b;
     double *const c;
-    int nra;
-    int nca;
-    int ncb;
+    int nra, nca, ncb;
     char verbose;
-    int *offsets;
-    int *prows;
+    int *offsets, *prows;
     MPI_Request *requests;
-    int numtasks;
-    int numworkers;
+    int numtasks, numworkers;
 } _params_nb;
 
 void fill_offsets_and_rows(_params_nb *);
 void master_send_nb(_params_nb *);
 void master_receive_nb(_params_nb *);
+void master_send(_params_nb *);
+void master_receive(_params_nb *);
 void worker_process_data(int, int);
+void fill_matrix(double *, double, int, int);
+
+void mpi_mm(const double *const a,
+            const double *const b,
+            double *const c,
+            int nra, int nca, int ncb,
+            int numtasks, int taskid,
+            char verbose)
+{
+    if (taskid == MASTER)
+    {
+        _params_nb params = {a, b, c, nra, nca, ncb, verbose};
+        params.numtasks = numtasks;
+        params.numworkers = params.numtasks - 1;
+        params.prows = (int *)malloc(params.numworkers * sizeof(int));
+        params.offsets = (int *)malloc(params.numworkers * sizeof(int));
+        fill_offsets_and_rows(&params);
+
+        master_send(&params);
+        master_receive(&params);
+        free(params.requests);
+        free(params.prows);
+        free(params.offsets);
+    }
+    else
+    {
+        worker_process_data(nca, ncb);
+    }
+}
 
 void mpi_mm_nb(const double *const a,
                const double *const b,
@@ -76,6 +102,33 @@ void fill_offsets_and_rows(_params_nb *ps)
     ps->prows[ps->numworkers - 1] = averow;
 }
 
+void master_send(_params_nb *ps)
+{
+    int i, dest, rows, offset;
+
+    for (i = 0; i < ps->numworkers; i++)
+    {
+        dest = i + 1;
+        rows = ps->prows[i];
+        offset = ps->offsets[i];
+        if (ps->verbose)
+        {
+            printf("Send %d rows to task %d offset= %d\n",
+                   rows, dest, offset);
+        }
+        MPI_Send(&rows, 1, MPI_INT, dest,
+                  FROM_MASTER, MPI_COMM_WORLD);
+        MPI_Send(ps->a + offset * ps->nca, rows * ps->nca, MPI_DOUBLE, dest,
+                  FROM_MASTER, MPI_COMM_WORLD);
+        MPI_Send(ps->b, ps->nca * ps->ncb, MPI_DOUBLE, dest,
+                  FROM_MASTER, MPI_COMM_WORLD);
+    }
+    if (ps->verbose)
+    {
+        printf("\n");
+    }
+}
+
 void master_send_nb(_params_nb *ps)
 {
     int i, dest, base, rows, offset;
@@ -115,6 +168,26 @@ void master_send_nb(_params_nb *ps)
     if (ps->verbose)
     {
         printf("\n");
+    }
+}
+
+void master_receive(_params_nb *ps)
+{
+    int i, source, offset, rows;
+    MPI_Status status;
+
+    for (i = 0; i < ps->numworkers; i++)
+    {
+        source = i + 1;
+        offset = ps->offsets[i];
+        rows = ps->prows[i];
+        MPI_Recv(ps->c + offset * ps->ncb, rows * ps->ncb, MPI_DOUBLE,
+                  source, FROM_WORKER,
+                  MPI_COMM_WORLD, &status);
+        if (ps->verbose)
+        {
+            printf("Recieve results from task %d\n", source);
+        }
     }
 }
 
@@ -169,24 +242,6 @@ void worker_process_data(int nca, int ncb)
              MPI_COMM_WORLD, &status);
 
     c = (double (*)[ncb])malloc(rows * ncb * sizeof(double));
-    // int taskid;
-    // MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
-    // if (taskid != 0){
-    //     printf("A:\n");
-    //     for (i = 0; i < rows; i++){
-    //         for (j = 0; j < nca; j++){
-    //             printf("%f ", a[i][j]);
-    //         }
-    //         printf("\n");
-    //     }
-    //     printf("B:\n");
-    //     for (i = 0; i < nca; i++){
-    //         for (j = 0; j < ncb; j++){
-    //             printf("%f ", b[i][j]);
-    //         }
-    //         printf("\n");
-    //     }
-    // }
     for (k = 0; k < ncb; k++)
         for (i = 0; i < rows; i++)
         {
@@ -194,18 +249,17 @@ void worker_process_data(int nca, int ncb)
             for (j = 0; j < nca; j++)
                 c[i][k] = c[i][k] + a[i][j] * b[j][k];
         }
-    // printf("C:\n");
-    // for (i = 0; i < rows; i++)
-    // {
-    //     for (j = 0; j < ncb; j++)
-    //     {
-    //         printf("%f ", c[i][j]);
-    //     }
-    //     printf("\n");
-    // }
 
     MPI_Send(c, rows * ncb, MPI_DOUBLE, MASTER,
              FROM_WORKER, MPI_COMM_WORLD);
+}
+
+void fill_matrix(double *m, double val, int nr, int nc)
+{
+    int i, j;
+    for (i = 0; i < nr; i++)
+        for (j = 0; j < nc; j++)
+            m[nc * i + j] = val;
 }
 
 #endif // MPI_MATRIX_MULTIPLICATION_H

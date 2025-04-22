@@ -13,10 +13,15 @@ int main(int argc, char *argv[])
     double a[NRA][NCA], /* matrix A to be multiplied */
         b[NCA][NCB],    /* matrix B to be multiplied */
         c[NRA][NCB];    /* result matrix C */
+
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
-
+    if (numtasks < 2)
+    {
+        fprintf(stderr, "Need at least two MPI tasks. Quitting...\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
     if (taskid == MASTER)
     {
         printf("mpi_mm has started with %d tasks.\n", numtasks);
@@ -24,9 +29,7 @@ int main(int argc, char *argv[])
         fill_matrix(b, 10, NCA, NCB);
         printf("\n");
     }
-
-    mpi_mm_nb((double *)a, (double *)b, (double *)c, NRA, NCA, NCB, numtasks, taskid, 1);
-
+    mpi_mm((double *)a, (double *)b, (double *)c, NRA, NCA, NCB, numtasks, taskid, 1);
     if (taskid == MASTER)
     {
         printf("****\n");
