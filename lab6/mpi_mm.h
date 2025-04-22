@@ -266,10 +266,9 @@ void worker_process_data(int nca, int ncb)
 
 void fill_matrix(double *m, double val, int nr, int nc)
 {
-    int i, j;
-    for (i = 0; i < nr; i++)
-        for (j = 0; j < nc; j++)
-            m[nc * i + j] = val;
+    int i;
+    for (i = 0; i < nr*nc; i++)
+        m[i] = val;
 }
 
 #endif // MPI_MATRIX_MULTIPLICATION_H
