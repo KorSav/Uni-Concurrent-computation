@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     double a[NRA][NCA], /* matrix A to be multiplied */
         b[NCA][NCB],    /* matrix B to be multiplied */
         c[NRA][NCB];    /* result matrix C */
+
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    mpi_mm_nb((double *)a, (double *)b, (double *)c, NRA, NCA, NCB, numtasks, taskid, 1);
+    mpi_mm_nb((double *)a, (double *)b, (double *)c, NRA, NCA, NCB, 1);
 
     if (taskid == MASTER)
     {

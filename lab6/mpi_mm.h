@@ -22,6 +22,8 @@ typedef struct _params_nb
     int numtasks, numworkers;
 } _params_nb;
 
+void __mpi_mm(const double *const, const double *const, double *const,
+              int, int, int, char, int);
 void fill_offsets_and_rows(_params_nb *);
 void master_send_nb(_params_nb *);
 void master_receive_nb(_params_nb *);
@@ -34,49 +36,57 @@ void mpi_mm(const double *const a,
             const double *const b,
             double *const c,
             int nra, int nca, int ncb,
-            int numtasks, int taskid,
             char verbose)
 {
-    if (taskid == MASTER)
-    {
-        _params_nb params = {a, b, c, nra, nca, ncb, verbose};
-        params.numtasks = numtasks;
-        params.numworkers = params.numtasks - 1;
-        params.prows = (int *)malloc(params.numworkers * sizeof(int));
-        params.offsets = (int *)malloc(params.numworkers * sizeof(int));
-        fill_offsets_and_rows(&params);
-
-        master_send(&params);
-        master_receive(&params);
-        free(params.requests);
-        free(params.prows);
-        free(params.offsets);
-    }
-    else
-    {
-        worker_process_data(nca, ncb);
-    }
+    __mpi_mm(a, b, c, nra, nca, ncb, verbose, 1);
 }
 
 void mpi_mm_nb(const double *const a,
                const double *const b,
                double *const c,
                int nra, int nca, int ncb,
-               int numtasks, int taskid,
                char verbose)
 {
+    __mpi_mm(a, b, c, nra, nca, ncb, verbose, 0);
+}
+
+void __mpi_mm(const double *const a,
+              const double *const b,
+              double *const c,
+              int nra, int nca, int ncb,
+              char verbose, int isBlocking)
+{
+    int numtasks, taskid;
+
+    MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+    MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
+    if (numtasks < 2)
+    {
+        fprintf(stderr, "Need at least two MPI tasks. Quitting...\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+
     if (taskid == MASTER)
     {
         _params_nb params = {a, b, c, nra, nca, ncb, verbose};
         params.numtasks = numtasks;
         params.numworkers = params.numtasks - 1;
-        params.requests = (MPI_Request *)malloc(params.numworkers * MAX_SEND_COUNT_PER_WORKER * sizeof(MPI_Request));
+        if (!isBlocking)
+            params.requests = (MPI_Request *)malloc(params.numworkers * MAX_SEND_COUNT_PER_WORKER * sizeof(MPI_Request));
         params.prows = (int *)malloc(params.numworkers * sizeof(int));
         params.offsets = (int *)malloc(params.numworkers * sizeof(int));
         fill_offsets_and_rows(&params);
 
-        master_send_nb(&params);
-        master_receive_nb(&params);
+        if (!isBlocking)
+        {
+            master_send_nb(&params);
+            master_receive_nb(&params);
+        }
+        else
+        {
+            master_send(&params);
+            master_receive(&params);
+        }
         free(params.requests);
         free(params.prows);
         free(params.offsets);
@@ -117,11 +127,11 @@ void master_send(_params_nb *ps)
                    rows, dest, offset);
         }
         MPI_Send(&rows, 1, MPI_INT, dest,
-                  FROM_MASTER, MPI_COMM_WORLD);
+                 FROM_MASTER, MPI_COMM_WORLD);
         MPI_Send(ps->a + offset * ps->nca, rows * ps->nca, MPI_DOUBLE, dest,
-                  FROM_MASTER, MPI_COMM_WORLD);
+                 FROM_MASTER, MPI_COMM_WORLD);
         MPI_Send(ps->b, ps->nca * ps->ncb, MPI_DOUBLE, dest,
-                  FROM_MASTER, MPI_COMM_WORLD);
+                 FROM_MASTER, MPI_COMM_WORLD);
     }
     if (ps->verbose)
     {
@@ -182,8 +192,8 @@ void master_receive(_params_nb *ps)
         offset = ps->offsets[i];
         rows = ps->prows[i];
         MPI_Recv(ps->c + offset * ps->ncb, rows * ps->ncb, MPI_DOUBLE,
-                  source, FROM_WORKER,
-                  MPI_COMM_WORLD, &status);
+                 source, FROM_WORKER,
+                 MPI_COMM_WORLD, &status);
         if (ps->verbose)
         {
             printf("Recieve results from task %d\n", source);
