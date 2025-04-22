@@ -32,6 +32,7 @@ void master_receive(_params_nb *);
 void worker_process_data(int, int);
 void fill_matrix(double *, double, int, int);
 
+// Workers should not allocate any matrices, null pointers can be passed
 void mpi_mm(const double *const a,
             const double *const b,
             double *const c,
@@ -41,6 +42,7 @@ void mpi_mm(const double *const a,
     __mpi_mm(a, b, c, nra, nca, ncb, verbose, 1);
 }
 
+// Workers should not allocate any matrices, null pointers can be passed
 void mpi_mm_nb(const double *const a,
                const double *const b,
                double *const c,
@@ -262,12 +264,15 @@ void worker_process_data(int nca, int ncb)
 
     MPI_Send(c, rows * ncb, MPI_DOUBLE, MASTER,
              FROM_WORKER, MPI_COMM_WORLD);
+    free(a);
+    free(b);
+    free(c);
 }
 
 void fill_matrix(double *m, double val, int nr, int nc)
 {
     int i;
-    for (i = 0; i < nr*nc; i++)
+    for (i = 0; i < nr * nc; i++)
         m[i] = val;
 }
 
