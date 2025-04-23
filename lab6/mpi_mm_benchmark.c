@@ -13,9 +13,9 @@ int main(int argc, char *argv[])
     const char *file_path;
     double start, end, time_blocking, time_nonblocking, speedup;
 
-    if (argc != 2)
+    if (argc != 3)
     {
-        fprintf(stderr, "Usage: %s <output_file_path>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <output_file_path> <separator>\n", argv[0]);
         return 1;
     }
 
@@ -75,7 +75,10 @@ int main(int argc, char *argv[])
             time_nonblocking = end - start;
 
             speedup = time_blocking / time_nonblocking;
-            fprintf(fp, "%.3e\t%.3e\t%.3f\t", time_blocking, time_nonblocking, speedup);
+
+            fprintf(fp, "%.3f%4$s%.3f%4$s%.3f%4$s",
+                    time_blocking, time_nonblocking, speedup,
+                    argv[2]);
             fflush(fp);
             free(a);
             free(b);
