@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     double *a, *b, *c;
     FILE *fp;
     const char *file_path;
-    double start, end, time_blocking, time_nonblocking, speedup;
+    double start, end, time_blocking, time_nonblocking;
 
     if (argc != 3)
     {
@@ -74,10 +74,8 @@ int main(int argc, char *argv[])
             end = MPI_Wtime();
             time_nonblocking = end - start;
 
-            speedup = time_blocking / time_nonblocking;
-
-            fprintf(fp, "%.3f%4$s%.3f%4$s%.3f%4$s",
-                    time_blocking, time_nonblocking, speedup,
+            fprintf(fp, "%.3f%3$s%.3f%3$s",
+                    time_blocking, time_nonblocking,
                     argv[2]);
             fflush(fp);
             free(a);
